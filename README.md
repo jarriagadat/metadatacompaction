@@ -127,43 +127,45 @@ MetadataCompaction exists to save cognitive bandwidth.
 It is a preprocessing tool — not a citation manager, not a catalog, and not a replacement for human judgment.
 Its purpose is simple: Make large academic libraries immediately usable.
 
-🔧 High‑level Architecture
-
-            ┌──────────────────────┐
-            │   Root Folder (PDFs) │
-            │  (Messy Filenames)   │
-            └─────────┬────────────┘
-                      │
-                      ▼
-        ┌─────────────────────────────┐
-        │     Filename Parser Layer   │
-        │                             │
-        │  1. Anna’s Archive pattern  │
-        │  2. Publisher pattern       │
-        │  3. Fallback heuristic      │
-        └─────────────┬───────────────┘
-                      │
-                      ▼
-        ┌─────────────────────────────┐
-        │   Normalization & Rules     │
-        │  - Author extraction        │
-        │  - Year inference           │
-        │  - Title cleanup            │
-        └─────────────┬───────────────┘
-                      │
-                      ▼
-        ┌─────────────────────────────┐
-        │   Deterministic Renaming    │
-        │   AUTHOR YEAR Title.pdf     │
-        └────────── ──┬───────────────┘
-                      │
-
-          ┌───────────┴───────────┐
-          ▼                       ▼
-┌────────────────┐     ┌────────────────┐
-│   renamed/     │     │    errors/     │
-│ (usable files) │     │ (edge cases)   │
-└────────────────┘     └────────────────┘
+┌──────────────────────────────┐
+│     Root Folder (PDFs)       │
+│      Messy Filenames         │
+└───────────────┬──────────────┘
+                │
+                ▼
+┌──────────────────────────────┐
+│     Filename Parser Layer    │
+│                              │
+│  1. Anna’s Archive pattern   │
+│  2. Publisher pattern        │
+│  3. Fallback heuristic       │
+│                              │
+└───────────────┬──────────────┘
+                │
+                ▼
+┌──────────────────────────────┐
+│   Normalization & Rules      │
+│                              │
+│  • Author extraction         │
+│  • Year inference            │
+│  • Title cleanup             │
+│                              │
+└───────────────┬──────────────┘
+                │
+                ▼
+┌──────────────────────────────┐
+│   Deterministic Renaming     │
+│                              │
+│   AUTHOR YEAR Title.pdf      │
+│                              │
+└───────────────┬──────────────┘
+                │
+        ┌───────┴────────┐
+        ▼                ▼
+┌──────────────┐  ┌──────────────┐
+│   renamed/   │  │    errors/   │
+│ (usable PDFs)│  │ (edge cases) │
+└──────────────┘  └──────────────┘
 
 
 🧠 Architectural Principles
