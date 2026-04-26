@@ -157,12 +157,14 @@ Its purpose is simple: Make large academic libraries immediately usable.
         │   AUTHOR YEAR Title.pdf     │
         └────────── ──┬───────────────┘
                       │
+
           ┌───────────┴───────────┐
           ▼                       ▼
 ┌────────────────┐     ┌────────────────┐
 │   renamed/     │     │    errors/     │
 │ (usable files) │     │ (edge cases)   │
 └────────────────┘     └────────────────┘
+
 
 🧠 Architectural Principles
 
