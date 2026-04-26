@@ -1,177 +1,188 @@
-📚 MetadataCompaction
+```markdown
+# MetadataCompaction
 
-A practical tool for consolidating messy academic metadata under working loads.
+**A practical tool for consolidating messy academic metadata under working loads.**
 
-MetadataCompaction is a pragmatic Python utility to rename and normalize academic PDF files downloaded from heterogeneous sources (e.g. Anna’s Archive, Springer, Elsevier), using filename heuristics with graceful fallback rules and optional local LLM assistance via Ollama.
-The goal is usability, not perfect bibliographic reconstruction.
+MetadataCompaction is a small Python utility to rename academic PDF files downloaded from mixed sources (Anna’s Archive, Springer, random publishers, personal dumps) into **consistent, usable filenames**.
 
-🧠 Motivation
-Large academic libraries often begin in a highly disturbed state:
+It is designed to **save time**, not to achieve perfect bibliographic accuracy.
 
-inconsistent filenames
-missing or partial metadata
-publisher‑specific naming conventions
-mixed standards and document types
+---
 
-Pursuing perfect metadata at ingestion time is expensive and unnecessary.
-MetadataCompaction applies a controlled “load” to chaotic filenames, compacting them into a usable residual state.
-The remaining uncertainty is intentionally deferred to human judgment, where it belongs.
+## Purpose
 
-✨ Core Features
+Academic PDF libraries usually start in a bad state:
 
-✅ Handles real‑world messy filenames
-✅ Supports:
+- Long and inconsistent filenames  
+- Mixed naming styles  
+- Missing authors or years  
+- Publisher junk embedded in filenames  
 
-Anna’s Archive–style filenames
-Springer / publisher book filenames
+MetadataCompaction automates most of the cleanup so that the library becomes immediately usable.  
+The remaining few ambiguous cases can be corrected manually **only when needed**.
 
+---
 
-✅ Optional local LLM support via Ollama (offline, no APIs)
-✅ Always renames files (never ignores or drops them)
-✅ Graceful fallback when metadata is incomplete
-✅ Deterministic, repeatable behavior
-✅ Produces filenames optimized for fast search tools (e.g. Everything)
+## What the Script Does
 
+1. You place PDF files in the same folder as the script  
+2. You run the script  
+3. For each PDF:
+   - The filename is read
+   - Author, year, and title are inferred from the filename
+   - A clean filename is created
+   - The file is moved and renamed
+4. A log is written describing what happened
 
-🤖 Local LLM Support (Ollama)
-MetadataCompaction is designed to optionally leverage Ollama to assist with difficult filename cases without relying on cloud APIs.
-Why Ollama?
+After the script finishes:
+- No PDFs remain in the root folder
+- All PDFs are renamed and organized
 
-✅ Runs fully local and offline
-✅ No API keys
-✅ No data leakage
-✅ Ideal for large private academic libraries
+---
 
-The LLM is not trusted blindly — it is used only as an assistive tool, and all outputs are constrained by deterministic naming rules and fallbacks.
+## Filename Format
 
-In other words: LLMs help under uncertainty, but rules remain in control.
+All files are renamed into the format:
 
+```
 
-📁 Expected Folder Structure
-Place the script and PDFs in the same folder:
-project_folder/
-├── rename_books_local.py
-├── book1.pdf
-├── book2.pdf
-├── renamed/
-│   └── run_log.txt
-└── errors/
-
-
-▶ Usage
-
-Place PDF files in the same directory as rename_books_local.py
-Run:
-``
-python rename_books_local.py
-``
-📦 Output Behavior
-After execution:
-
-✅ All PDFs are moved out of the root folder
-✅ The root folder is left clean
-✅ Files are placed into:
-
-renamed/
-errors/
-
-
-✅ A detailed execution log is written to:
-
-renamed/run_log.txt
-
-
-🏷️ Naming Strategy
-All files are normalized into a consistent, search‑friendly format:
 AUTHOR YEAR Title.pdf
 
-Examples
+```
+
+Examples:
+
+```
+
 Corea 2019 An Introduction to Data.pdf
 Ioannidis 2019 Design of Steel Structures to Eurocode.pdf
 Unknown YYYY Foundations for Light Garden Walls.pdf
 
+```
 
-Parsing Priority
+If metadata cannot be confidently identified, placeholders are used instead of failing.
 
-Known filename conventions (e.g. Anna’s Archive)
-Publisher‑specific patterns (e.g. Springer)
-Fallback renaming when metadata is unclear
+---
 
-This guarantees that no file is ever skipped or lost.
+## Folder Structure After Running
 
-🚧 Design Decisions (Intentional)
-MetadataCompaction intentionally:
+```
 
-❌ Does not parse PDF content by default
-❌ Does not attempt perfect bibliographic accuracy
-❌ Does not depend on cloud services or APIs
+project\_folder/
+├── rename\_books\_local.py
+├── renamed/
+│   ├── Clean\_File\_Name.pdf
+│   └── run\_log.txt
+└── errors/
+└── Extremely\_Broken\_File.pdf
 
-These constraints keep the tool:
+```
 
-fast
-offline‑friendly
-robust
-easy to maintain
+- Files are **moved**, not copied  
+- No PDF remains in the root folder  
 
-Reference managers can be applied after filenames are stabilized.
+---
 
-🧪 Engineering Philosophy
-This tool follows a practical approach
-MetadataCompaction automates approximately 90–95% of library cleanup, allowing the remaining edge cases to be resolved manually only when they are actually encountered again.
+## How Metadata Is Determined
 
-📜 License
-MIT License — see the LICENSE file.
+The script tries several approaches **in order**:
 
-🧑‍🔧 Final Note
-MetadataCompaction exists to save cognitive bandwidth.
-It is a preprocessing tool — not a citation manager, not a catalog, and not a replacement for human judgment.
-Its purpose is simple: Make large academic libraries immediately usable.
+1. **Anna’s Archive style**
+   - Filenames using `--` as separators
+2. **Publisher / Springer style**
+   - Filenames like `Author - Title (Year)`
+3. **Fallback**
+   - Best possible guess using available words
+   - Uses `Unknown` or `YYYY` when necessary
 
-┌──────────────────────────────┐
-│     Root Folder (PDFs)       │
-│      Messy Filenames         │
-└───────────────┬──────────────┘
-                │
-                ▼
-┌──────────────────────────────┐
-│     Filename Parser Layer    │
-│                              │
-│  1. Anna’s Archive pattern   │
-│  2. Publisher pattern        │
-│  3. Fallback heuristic       │
-│                              │
-└───────────────┬──────────────┘
-                │
-                ▼
-┌──────────────────────────────┐
-│   Normalization & Rules      │
-│                              │
-│  • Author extraction         │
-│  • Year inference            │
-│  • Title cleanup             │
-│                              │
-└───────────────┬──────────────┘
-                │
-                ▼
-┌──────────────────────────────┐
-│   Deterministic Renaming     │
-│                              │
-│   AUTHOR YEAR Title.pdf      │
-│                              │
-└───────────────┬──────────────┘
-                │
-        ┌───────┴────────┐
-        ▼                ▼
-┌──────────────┐  ┌──────────────┐
-│   renamed/   │  │    errors/   │
-│ (usable PDFs)│  │ (edge cases) │
-└──────────────┘  └──────────────┘
+This guarantees that every file is renamed.
 
+---
 
-🧠 Architectural Principles
+## Local LLM Support (Ollama)
 
-Single pass processing
-No file is skipped
-Fallback always available
-Human‑in‑the‑loop by design
-Offline, deterministic execution
+MetadataCompaction can optionally use **Ollama**, a local large‑language‑model runtime, to assist with difficult filename cases.
+
+- Fully offline
+- No API keys
+- No cloud services
+- No data leaves the machine
+
+LLM output is constrained by deterministic naming rules and fallback logic.
+
+---
+
+## Simple Processing Flow
+
+```
+
+Messy PDF filenames
+↓
+Read filename text
+↓
+Infer author, year, title
+↓
+Create clean filename
+↓
+Move file to renamed/ or errors/
+↓
+Write log entry
+
+```
+
+Single pass. No retries. No skipped files.
+
+---
+
+## Logging
+
+Each run creates or appends to:
+
+```
+
+renamed/run\_log.txt
+
+```
+
+The log records:
+- Timestamps
+- Original filenames
+- Classification decisions
+- Final filenames
+
+---
+
+## Design Decisions
+
+- PDF contents are not parsed
+- No external APIs are required
+- Bibliographic perfection is not the goal
+- Human judgment is reserved for edge cases
+
+These decisions keep the tool fast, offline, and maintainable.
+
+---
+
+## Engineering Philosophy
+
+MetadataCompaction follows a simple engineering principle:
+
+> Automate most of the work, and design for a usable residual state.
+
+Approximately 90–95% of files are handled automatically.  
+The remaining cases are intentionally left for manual refinement.
+
+---
+
+## License
+
+MIT License.
+
+---
+
+## Final Note
+
+This tool exists to reduce cognitive load.
+
+Its purpose is to transform chaotic academic libraries into collections that are immediately searchable, sortable, and usable—without demanding perfection at ingestion time.
+```
